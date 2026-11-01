@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ClassDesk — Tuition manager</title><meta name="theme-color" content="#0f766e">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--a:#0f766e;--a2:#14b8a6;--bg:#f0fdfa;--t:#0f2a2a;--m:#64748b;--g:#16a34a;--r:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+button,input,select,textarea{font:inherit}.hide{display:none!important}
+#auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0f766e,#14b8a6 60%,#fbbf24)}
+.box{background:#fff;border-radius:24px;padding:30px 26px;width:100%;max-width:400px;box-shadow:0 20px 50px rgba(15,118,110,.3)}
+.box h1{text-align:center;font-size:27px}.box h1 span{color:var(--a)}
+.sub{text-align:center;color:var(--m);font-size:13px;margin:4px 0 18px}
+label{display:block;font-size:12px;font-weight:600;color:var(--m);margin-bottom:12px}
+input,select,textarea{display:block;width:100%;margin-top:5px;padding:11px 13px;border:1.5px solid #cfe7e3;border-radius:10px;background:#f8fffe;color:var(--t);font-size:14px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--a);background:#fff}
+.btn{width:100%;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;font-weight:600;cursor:pointer}
+.ghost{padding:13px;border:0;border-radius:12px;background:#e6f4f1;color:var(--t);font-weight:500;cursor:pointer}
+.link{background:none;border:0;color:var(--a);font-size:13px;text-decoration:underline;cursor:pointer;margin:8px 6px 0 0}
+.msg{font-size:12px;text-align:center;margin-top:10px;min-height:16px;color:var(--r)}.msg.ok{color:var(--g)}
+.top{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:calc(12px + env(safe-area-inset-top)) 18px 12px;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff}
+.top b{font-size:17px}.top button{background:rgba(255,255,255,.2);border:0;color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px}
+.page{padding:16px 16px 110px}
+.card{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(15,118,110,.08)}
+.card h3{font-size:14px;margin-bottom:8px}
+.hero{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;border-radius:18px;padding:20px;margin-bottom:12px}.hero small{color:#fff;opacity:.9}.hero div{font-size:26px;font-weight:700}
+.grid,.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.row2 input,.row2 select{margin-top:0}
+.grid .card{margin:0}small{font-size:11px;color:var(--m);font-weight:600}.grid b{display:block;font-size:20px;margin-top:4px}
+.mnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-weight:600}
+.mnav button{border:0;background:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer}
+.item{display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid #eef7f5}.item:last-child{border:0}
+.s{font-size:11px;color:var(--m);margin-top:2px}.x{background:none;border:0;color:var(--m);cursor:pointer;padding:4px}
+.between{display:flex;justify-content:space-between;gap:8px}.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.pill{border:0;border-radius:20px;padding:7px 12px;font-size:12px;font-weight:600;background:#e6f4f1;color:var(--a);cursor:pointer;text-decoration:none;display:inline-block}
+.pill.ok{background:#dcfce7;color:#166534}.pill.no{background:#fee2e2;color:#991b1b}
+.tag{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:#fef3c7;color:#92400e}
+.dots{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}.dots i{width:14px;height:14px;border-radius:4px}
+.empty{text-align:center;color:var(--m);font-size:13px;padding:30px 0;line-height:1.6}
+h3.sec{font-size:14px;margin:16px 0 4px}
+.fab{position:fixed;right:18px;bottom:84px;width:54px;height:54px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;font-size:26px;cursor:pointer;box-shadow:0 6px 20px rgba(15,118,110,.4);z-index:6}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #d5ece8;padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:6}
+nav button{flex:1;border:0;background:none;color:var(--m);font-size:10px;font-weight:600;display:flex;flex-direction:column;gap:2px;align-items:center;cursor:pointer}nav span{font-size:19px}nav .on{color:var(--a)}
+.ov{position:fixed;inset:0;background:rgba(15,42,42,.5);display:none;align-items:flex-end;justify-content:center;z-index:20}.ov.open{display:flex}
+.sheet{background:#fff;border-radius:24px 24px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:90vh;overflow:auto}.sheet h2{font-size:18px;margin-bottom:12px}
+.row{display:flex;gap:10px;margin-top:16px}.row>*{flex:1}
+</style></head><body>
+
+<div id="auth" class="hide"><div class="box"><h1>Class<span>Desk</span></h1><p class="sub">Fees, attendance, marks and parent updates</p>
+<div id="f-login"><label>Email<input id="l-e" type="email"></label><label>Password<input id="l-p" type="password"></label><button class="btn" onclick="doLogin()">Log in</button><div style="text-align:center"><button class="link" onclick="showAuth('forgot')">Forgot password?</button><button class="link" onclick="showAuth('reg')">Create account</button></div></div>
+<div id="f-reg" class="hide"><label>Tuition centre / school name<input id="r-c"></label><label>Your name<input id="r-n"></label><label>Email<input id="r-e" type="email"></label><label>Password (min 6 characters)<input id="r-p" type="password"></label><button class="btn" onclick="doReg()">Create account</button><div style="text-align:center"><button class="link" onclick="showAuth('login')">Back to log in</button></div></div>
+<div id="f-forgot" class="hide"><label>Your email<input id="fg-e" type="email"></label><button class="btn" onclick="doForgot()">Send reset link</button><div style="text-align:center"><button class="link" onclick="showAuth('login')">Back to log in</button></div></div>
+<div id="f-reset" class="hide"><label>New password<input id="rs-p" type="password"></label><button class="btn" onclick="doReset()">Save new password</button></div>
+<div id="am" class="msg"></div></div></div>
+
+<div id="par" class="hide"></div>
+
+<div id="app" class="hide">
+<div class="top"><b id="cn"></b><button onclick="logout()">Log out</button></div>
+<div class="page" id="main"></div>
+<button id="fab" class="fab" onclick="fab()" aria-label="Add">+</button>
+<nav><button data-t="stu" onclick="go('stu')"><span>👥</span>Students</button><button data-t="att" onclick="go('att')"><span>✅</span>Attendance</button><button data-t="fee" onclick="go('fee')"><span>💰</span>Fees</button><button data-t="not" onclick="go('not')"><span>📢</span>Notices</button></nav>
+</div>
+<div id="modal" class="ov" onclick="if(event.target===this)closeM()"><div class="sheet"><h2 id="mt"></h2><div id="mb"></div><div class="row"><button class="ghost" onclick="closeM()">Close</button><button id="ms" class="btn">Save</button></div></div></div>
+
+<script>
+const SB_URL='https://hfanuyvkcdwxxuysrhvv.supabase.co',SB_KEY='sb_publishable_UfhpCNmQswfcxcni9vyHwA_k9j6CZZb';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n||0);
+const fd=s=>s?new Date(s+'T00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+const mname=m=>new Date(m+'-01T00:00').toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+const sb=supabase.createClient(SB_URL,SB_KEY);
+let U=null,S=[],C=[],NL=[],tab='stu',AD=today(),FM=today().slice(0,7),BF='',AM={},rec=location.hash.includes('type=recovery');
+const centre=()=>(U&&U.user_metadata&&U.user_metadata.centre)||'our tuition centre';
+const ck=r=>{if(r.error){alert(r.error.message);return false}return true};
+const stu=id=>S.find(x=>x.id===id);
+const wa=(p,t)=>{let d=String(p||'').replace(/\D/g,'');if(d.length===10)d='91'+d;window.open('https://wa.me/'+d+'?text='+encodeURIComponent(t),'_blank')};
+const link=s=>location.origin+location.pathname+'#p='+s.token;
+
+// ---------- auth ----------
+function showAuth(m){$('auth').classList.remove('hide');$('app').classList.add('hide');['login','reg','forgot','reset'].forEach(x=>$('f-'+x).classList.toggle('hide',x!==m));say('')}
+function say(t,ok){const e=$('am');e.textContent=t;e.className='msg'+(ok?' ok':'')}
+async function doLogin(){const{error}=await sb.auth.signInWithPassword({email:$('l-e').value.trim(),password:$('l-p').value});if(error)say(error.message)}
+async function doReg(){const p=$('r-p').value;if(p.length<6)return say('Password must be at least 6 characters');
+ const{data,error}=await sb.auth.signUp({email:$('r-e').value.trim(),password:p,options:{data:{name:$('r-n').value.trim(),centre:$('r-c').value.trim()}}});
+ if(error)return say(error.message);if(!data.session)say('Account created. Check your email to confirm, then log in.',1)}
+async function doForgot(){const{error}=await sb.auth.resetPasswordForEmail($('fg-e').value.trim(),{redirectTo:location.origin+location.pathname});say(error?error.message:'Reset link sent. Check your email.',!error)}
+async function doReset(){const p=$('rs-p').value;if(p.length<6)return say('Use at least 6 characters');const{error}=await sb.auth.updateUser({password:p});if(error)return say(error.message);
+ rec=false;history.replaceState(null,'',location.pathname);const{data}=await sb.auth.getSession();U=data.session.user;enter()}
+async function logout(){await sb.auth.signOut();location.reload()}
+async function enter(){await loadS();$('auth').classList.add('hide');$('app').classList.remove('hide');$('cn').textContent=centre();go(tab)}
+async function loadS(){const[a,b]=await Promise.all([sb.from('students').select('*').order('name'),sb.from('classes').select('*').order('name')]);S=a.data||[];C=b.data||[]}
+
+// ---------- navigation ----------
+function go(t){tab=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('fab').classList.toggle('hide',t==='att'||t==='fee');({stu:rStu,att:rAtt,fee:rFee,not:rNot})[t]()}
+function fab(){tab==='stu'?addStu():addNot()}
+
+// ---------- students ----------
+function rStu(){$('main').innerHTML=classBox()+(S.length?S.map(s=>`<div class="card item" onclick="detail('${s.id}')"><div style="flex:1"><b>${esc(s.name)}</b><div class="s">${esc(s.batch||'')} · ${esc(s.phone||'')}</div></div><span class="tag">${money(s.fee)}/mo</span></div>`).join(''):'<p class="empty">No students yet.<br>Tap + to add your first student.</p>')}
+const classBox=()=>`<div class="card"><div class="between"><h3>Classes</h3><button class="link" style="margin:0" onclick="addClass()">+ Add class</button></div><div class="btns" style="margin:0">${C.map(c=>`<span class="pill">${esc(c.name)} · ${S.filter(s=>s.batch===c.name).length}<button class="x" style="padding:0 0 0 6px" onclick="delClass('${c.id}')">✕</button></span>`).join('')||'<span class="s">No classes yet. Tap + Add class first.</span>'}</div></div>`;
+function addClass(){openForm('Add class',[['name','Class name','text','placeholder="e.g. Class 8 Maths"']],async v=>{const n=v.name.trim();if(!n){alert('Enter a class name');return false}if(C.some(c=>c.name===n)){alert('This class already exists');return false}if(!ck(await sb.from('classes').insert({name:n})))return false;await loadS();rStu()})}
+async function delClass(id){if(!confirm('Remove this class from the list? Students keep their class name.'))return;if(ck(await sb.from('classes').delete().eq('id',id))){await loadS();rStu()}}
+function addStu(){if(!C.length){alert('Add a class first. Tap + Add class.');return}openForm('Add student',[['name','Student name','text',''],['batch','Class','select',C.map(c=>c.name)],['parent_name','Parent name','text',''],['phone','Parent phone (WhatsApp)','tel','inputmode="numeric"'],['emergency','Emergency contact number','tel','inputmode="numeric"'],['fee','Monthly fee (₹)','number','inputmode="numeric"'],['joined','Joined on','date','',today()]],async v=>{
+ if(!v.name.trim()||!v.phone.trim()){alert('Enter the student name and parent phone');return false}
+ const r=await sb.from('students').insert({name:v.name.trim(),batch:v.batch.trim(),parent_name:v.parent_name.trim(),phone:v.phone.trim(),emergency:v.emergency.trim(),fee:+v.fee||0,joined:v.joined||today()});
+ if(!ck(r))return false;await loadS();rStu()})}
+async function detail(id){const s=stu(id);
+ const[m,n]=await Promise.all([sb.from('marks').select('*').eq('student_id',id).order('day',{ascending:false}),sb.from('notes').select('*').eq('student_id',id).order('day',{ascending:false})]);
+ $('mt').textContent=s.name;
+ $('mb').innerHTML=`<p class="s">${esc(s.batch||'')} · Parent: ${esc(s.parent_name||'-')} · ${money(s.fee)}/month</p>
+ <div class="btns"><a class="pill" href="tel:${esc(s.phone)}">📞 Call parent</a><button class="pill ok" onclick="waParent('${id}')">WhatsApp</button><a class="pill no" href="tel:${esc(s.emergency)}">🚨 Emergency ${esc(s.emergency||'-')}</a></div>
+ <h3 class="sec">Marks</h3>${(m.data||[]).map(x=>`<div class="item"><div style="flex:1"><b>${esc(x.subject)}</b> · ${esc(x.test)}<div class="s">${fd(x.day)}</div></div><b>${x.score}/${x.outof}</b><button class="x" onclick="delRow('marks','${x.id}','${id}')">✕</button></div>`).join('')||'<p class="s">No marks yet.</p>'}<button class="link" onclick="addMark('${id}')">+ Add marks</button>
+ <h3 class="sec">Feedback</h3>${(n.data||[]).map(x=>`<div class="item"><div style="flex:1;font-size:13px">${esc(x.text)}<div class="s">${fd(x.day)}</div></div><button class="x" onclick="delRow('notes','${x.id}','${id}')">✕</button></div>`).join('')||'<p class="s">No feedback yet.</p>'}<button class="link" onclick="addNote('${id}')">+ Add feedback</button>
+ <h3 class="sec">Parent link</h3><p class="s">Parents open this link to see attendance, marks, feedback and announcements. No password needed.</p>
+ <div class="btns"><button class="pill ok" onclick="sendLink('${id}')">Send on WhatsApp</button><button class="pill" onclick="copyLink('${id}')">Copy</button><button class="pill" onclick="newLink('${id}')">Make new link</button></div>
+ <button class="link" style="color:var(--r)" onclick="delStu('${id}')">Delete student</button>`;
+ $('ms').classList.add('hide');$('modal').classList.add('open')}
+function waParent(id){wa(stu(id).phone,`Hello from ${centre()}.`)}
+function sendLink(id){const s=stu(id);wa(s.phone,`Hello! You can see ${s.name}'s attendance, marks and feedback here: ${link(s)}`)}
+function copyLink(id){navigator.clipboard.writeText(link(stu(id))).then(()=>alert('Link copied'))}
+async function newLink(id){if(!confirm('The old link will stop working. Make a new link?'))return;if(ck(await sb.from('students').update({token:crypto.randomUUID().replace(/-/g,'')}).eq('id',id))){await loadS();detail(id)}}
+async function delStu(id){if(!confirm('Delete this student and all their records?'))return;if(ck(await sb.from('students').delete().eq('id',id))){await loadS();closeM();rStu()}}
+async function delRow(t,id,sid){if(!confirm('Delete this entry?'))return;if(ck(await sb.from(t).delete().eq('id',id)))sid?detail(sid):rNot()}
+function addMark(id){openForm('Add marks',[['subject','Subject','text',''],['test','Test name','text','placeholder="e.g. Unit test 1"'],['score','Marks scored','number','inputmode="decimal"'],['outof','Out of','number','','100'],['day','Date','date','',today()]],async v=>{
+ if(!v.subject.trim()||v.score===''||!(+v.outof>0)){alert('Enter subject, marks and total');return false}
+ if(ck(await sb.from('marks').insert({student_id:id,subject:v.subject.trim(),test:v.test.trim(),score:+v.score,outof:+v.outof,day:v.day})))await detail(id);return false})}
+function addNote(id){openForm('Add feedback',[['text','Feedback for parents','textarea']],async v=>{
+ if(!v.text.trim()){alert('Write the feedback');return false}
+ if(ck(await sb.from('notes').insert({student_id:id,text:v.text.trim()})))await detail(id);return false})}
+
+// ---------- attendance ----------
+async function rAtt(){const r=await sb.from('attendance').select('student_id,present').eq('day',AD);AM={};(r.data||[]).forEach(x=>AM[x.student_id]=x.present);drawAtt()}
+function drawAtt(){const bs=C.map(c=>c.name),L=S.filter(s=>!BF||s.batch===BF);
+ $('main').innerHTML=`<div class="row2"><input type="date" value="${AD}" onchange="AD=this.value;rAtt()"><select onchange="BF=this.value;drawAtt()"><option value="">All batches</option>${bs.map(b=>`<option ${b===BF?'selected':''}>${esc(b)}</option>`).join('')}</select></div>`+
+ (L.length?`<div class="card">${L.map(s=>{const v=AM[s.id];return`<div class="item"><div style="flex:1"><b>${esc(s.name)}</b><div class="s">${esc(s.batch||'')}</div></div>${v===false?`<button class="pill" onclick="absentMsg('${s.id}')">Tell parent</button>`:''}<button class="pill ${v===true?'ok':''}" onclick="setAtt('${s.id}',true)">P</button><button class="pill ${v===false?'no':''}" onclick="setAtt('${s.id}',false)">A</button></div>`}).join('')}</div>`:'<p class="empty">No students here yet.</p>')}
+async function setAtt(id,p){AM[id]=p;drawAtt();ck(await sb.from('attendance').upsert({student_id:id,day:AD,present:p},{onConflict:'student_id,day'}))}
+function absentMsg(id){const s=stu(id);wa(s.phone,`Dear parent, ${s.name} was absent from class on ${fd(AD)}. - ${centre()}`)}
+
+// ---------- fees ----------
+function fm(n){const d=new Date(FM+'-01T00:00');d.setMonth(d.getMonth()+n);FM=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');rFee()}
+async function rFee(){const r=await sb.from('fees').select('student_id').eq('month',FM);const P=new Set((r.data||[]).map(x=>x.student_id));
+ const SS=S.filter(s=>(s.joined||'0').slice(0,7)<=FM),due=SS.filter(s=>!P.has(s.id)),got=SS.filter(s=>P.has(s.id)),sum=a=>a.reduce((t,s)=>t+(+s.fee||0),0);
+ const row=(s,p)=>`<div class="item"><div style="flex:1"><b>${esc(s.name)}</b><div class="s">${esc(s.batch||'')} · ${money(s.fee)}</div></div>${p?`<button class="pill ok" onclick="pay('${s.id}',0)">✓ Paid · Undo</button>`:`<button class="pill" onclick="remind('${s.id}')">Remind</button><button class="pill ok" onclick="pay('${s.id}',1)">Mark paid</button>`}</div>`;
+ $('main').innerHTML=`<div class="mnav"><button onclick="fm(-1)">‹</button><span>${mname(FM)}</span><button onclick="fm(1)">›</button></div>
+ <div class="grid"><div class="card"><small>Pending</small><b style="color:var(--r)">${money(sum(due))}</b><div class="s">${due.length} students</div></div><div class="card"><small>Collected</small><b style="color:var(--g)">${money(sum(got))}</b><div class="s">${got.length} students</div></div></div>`+
+ (S.length?`<div class="card">${due.map(s=>row(s,0)).join('')}${got.map(s=>row(s,1)).join('')}</div>`:'<p class="empty">Add students first.</p>')}
+async function pay(id,on){const r=on?await sb.from('fees').upsert({student_id:id,month:FM,amount:stu(id).fee},{onConflict:'student_id,month'}):await sb.from('fees').delete().eq('student_id',id).eq('month',FM);if(ck(r))rFee()}
+function remind(id){const s=stu(id);wa(s.phone,`Dear parent, ${s.name}'s tuition fee of ${money(s.fee)} for ${mname(FM)} is pending. Please pay when you can. Thank you. - ${centre()}`)}
+
+// ---------- notices ----------
+async function rNot(){const r=await sb.from('notices').select('*').order('day',{ascending:false});NL=r.data||[];
+ $('main').innerHTML=NL.length?NL.map(n=>`<div class="card"><div class="between"><b>${esc(n.title)}</b><span class="tag">${esc(n.batch||'All students')}</span></div><div class="s">${fd(n.day)}</div><p style="font-size:14px;margin:8px 0;white-space:pre-wrap">${esc(n.body)}</p><button class="pill ok" onclick="shareN('${n.id}')">Share on WhatsApp</button><button class="x" onclick="delRow('notices','${n.id}')">Delete</button></div>`).join(''):'<p class="empty">No announcements yet.<br>Tap + to write one.</p>'}
+function addNot(){openForm('New announcement',[['batch','Send to','select',['All students',...C.map(c=>c.name)]],['title','Title','text','placeholder="e.g. Holiday on Friday"'],['body','Message','textarea']],async v=>{
+ if(!v.title.trim()||!v.body.trim()){alert('Write a title and message');return false}
+ if(!ck(await sb.from('notices').insert({title:v.title.trim(),body:v.body.trim(),batch:v.batch==='All students'?null:v.batch})))return false;rNot()})}
+function shareN(id){const n=NL.find(x=>x.id===id);window.open('https://wa.me/?text='+encodeURIComponent(`📢 *${n.title}*\n${n.body}\n- ${centre()}`),'_blank')}
+
+// ---------- shared form sheet ----------
+function openForm(title,f,onSave){$('mt').textContent=title;
+ $('mb').innerHTML=f.map(x=>`<label>${x[1]}${x[2]==='select'?`<select id="f_${x[0]}">${x[3].map(o=>`<option>${esc(o)}</option>`).join('')}</select>`:x[2]==='textarea'?`<textarea id="f_${x[0]}" rows="4"></textarea>`:`<input id="f_${x[0]}" type="${x[2]}" ${x[3]||''}>`}</label>`).join('');
+ f.forEach(x=>{if(x[4])$('f_'+x[0]).value=x[4]});
+ $('ms').classList.remove('hide');$('ms').onclick=async()=>{const v={};f.forEach(x=>v[x[0]]=$('f_'+x[0]).value);if(await onSave(v)!==false)closeM()};$('modal').classList.add('open')}
+function closeM(){$('modal').classList.remove('open')}
+
+// ---------- parent view ----------
+async function parentMode(tok){$('auth').classList.add('hide');$('par').classList.remove('hide');
+ const r=await sb.rpc('parent_view',{tok}),d=r.data;
+ if(!d){$('par').innerHTML='<div class="page"><p class="empty">This link is not valid.<br>Please ask the tuition centre for a new link.</p></div>';return}
+ const a=d.att,pr=a.filter(x=>x.p).length,pc=a.length?Math.round(pr/a.length*100):0,bmo={};a.forEach(x=>{const m=x.d.slice(0,7);bmo[m]=bmo[m]||[0,0];bmo[m][1]++;if(x.p)bmo[m][0]++});const bm=Object.entries(bmo).sort();
+ $('par').innerHTML=`<div class="top"><b>${esc(d.centre||'Tuition centre')}</b></div><div class="page">
+ <div class="hero"><small>Class: ${esc(d.batch||'-')}</small><div>${esc(d.name)}</div></div>
+ <div class="card"><h3>Fees</h3>${d.pending.length?`<div style="font-size:24px;font-weight:700;color:var(--r)">${money(d.pending.length*d.fee)} pending</div><div class="s">${d.pending.map(m=>mname(m).split(' ')[0]).join(', ')} (${money(d.fee)} per month)</div>`:'<div style="font-size:18px;font-weight:700;color:var(--g)">No fees pending ✓</div>'}</div>
+ <div class="card"><h3>Attendance since 1 Jan ${new Date().getFullYear()}</h3><div style="font-size:30px;font-weight:700;color:${pc>=75?'var(--g)':'var(--r)'}">${a.length?pc+'%':'–'}</div><div class="s">${pr} present out of ${a.length} classes</div>${bm.map(([m,v])=>`<div class="item"><div style="flex:1">${mname(m).split(' ')[0]}</div><b>${v[0]} / ${v[1]}</b></div>`).join('')}</div>
+ <div class="card"><h3>Marks</h3>${d.marks.map(x=>`<div class="item"><div style="flex:1"><b>${esc(x.s)}</b> · ${esc(x.t)}<div class="s">${fd(x.d)}</div></div><b>${x.sc}/${x.o}</b></div>`).join('')||'<p class="s">No marks yet.</p>'}</div>
+ <div class="card"><h3>Teacher's feedback</h3>${d.notes.map(x=>`<div class="item"><div style="font-size:13px">${esc(x.t)}<div class="s">${fd(x.d)}</div></div></div>`).join('')||'<p class="s">No feedback yet.</p>'}</div>
+ <div class="card"><h3>Announcements</h3>${d.notices.map(x=>`<div class="item"><div><b>${esc(x.t)}</b><div style="font-size:13px;white-space:pre-wrap">${esc(x.b)}</div><div class="s">${fd(x.d)}</div></div></div>`).join('')||'<p class="s">No announcements.</p>'}</div></div>`}
+
+// ---------- start ----------
+window.addEventListener('DOMContentLoaded',()=>{
+ const m=location.hash.match(/^#p=([a-f0-9]{32})$/);
+ if(m){parentMode(m[1]);return}
+ sb.auth.onAuthStateChange((ev,s)=>{
+  if(rec||ev==='PASSWORD_RECOVERY'){rec=true;showAuth('reset');return}
+  if(!s){U=null;showAuth('login');return}
+  if(!U||U.id!==s.user.id){U=s.user;setTimeout(enter,0)}})
+});
+</script></body></html>
